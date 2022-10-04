@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './styles.css'
 import { Card } from '../../components/Card';
 
@@ -7,6 +7,7 @@ export function Home() {
   // 2 elemento => funcão que atualiza o state, pode receber uma valor inicial 
   const [studentName, setStudentName]= useState('valor inicial');
   const [ students, setStudents] = useState([]);
+  const [user, setUser ] = useState({ name: '', avatar: ''});
 
   function handleAddStudent() {
     const newStudent = {
@@ -26,9 +27,48 @@ export function Home() {
     setStudents(prevState => [...prevState, newStudent])
   }
  
+  useEffect(()=> {
+    // corpo do useEffect => ações a ser executadas
+    // É executado automaticamente quando a interface é inicializada / renderizada
+    
+    // fetch('https://api.github.com/users/messiascardoso')
+    // .then(response => response.json())
+    // .then(data => {
+    //   setUser({
+    //     name: data.name,
+    //     avatar: data.avatar_url
+    //   })
+    // });
+
+  // Para utilizar o async await
+
+  async function fetchData() {
+    const response =  await fetch('https://api.github.com/users/messiascardoso')
+    const data = await response.json()
+    setUser({
+      name: data.name,
+      avatar: data.avatar_url
+    })
+  }
+  fetchData()
+  console.log('useEffect foi chamado!!');
+  }, []) 
+  
+  // [] => Quando o array é vazio o user effect é executado somente uma vez e quer dizer que não tem dependências. 
+  // [students] => Ao passar um state assim que for alterado o valor o useEffect é executado novamente
+  // Pode receber uma lista de states separados por virgulas
+  // Bem utilizado ao buscar dados na API (Assincrono)
+  
+  
    return (
     <div className='container'>
-      <h1>Nome: { studentName}</h1>
+      <header>
+        <h1>Lista de presença</h1>
+        <div>
+          <strong>{ user.name }</strong>
+          <img src={ user.avatar } alt="Foto de perfil" />
+        </div>
+      </header>
       <input 
         type="text" 
         placeholder='Digite o nome...' 
